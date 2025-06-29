@@ -1,0 +1,15 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include requirements.txt
+include setup.sh
+include .gitignore
+recursive-include templates *.html
+recursive-include templates *.css
+recursive-include templates *.js
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
+global-exclude *.swp
+global-exclude *.swo 

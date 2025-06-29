@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Fill Forms</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            margin: 0; padding: 20px; background: #f8f9fa; min-width: 300px;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .btn { 
+            background: #667eea; color: white; border: none; padding: 10px 20px; 
+            border-radius: 6px; cursor: pointer; margin: 5px; width: 100%;
+        }
+        .btn:hover { background: #5a6fd8; }
+        .btn-secondary { background: #6c757d; }
+        .persona-select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+        .form-data { 
+            background: white; padding: 15px; border-radius: 8px; margin: 10px 0; 
+            border: 1px solid #ddd; font-size: 12px;
+        }
+        .field { margin: 5px 0; display: flex; justify-content: space-between; }
+        .label { font-weight: bold; }
+        .value { color: #666; }
+        .instructions { font-size: 12px; color: #666; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🎭 Auto-Fill Forms</h2>
+        <p>Generate fake data for web forms</p>
+    </div>
+    
+    <div>
+        <button class="btn" onclick="generateNewData()">🎲 Generate New Data</button>
+        
+        <select id="personaSelect" class="persona-select" onchange="loadSelectedPersona()">
+            <option value="">Select saved persona...</option>
+        </select>
+        
+        <button class="btn btn-secondary" onclick="refreshPersonas()">🔄 Refresh Saved</button>
+    </div>
+    
+    <div id="formData"></div>
+    
+    <div class="instructions">
+        <strong>How to use:</strong><br>
+        1. Generate or select fake data above<br>
+        2. Copy the values you need<br>
+        3. Paste into web forms manually<br>
+        <br>
+        <em>For automatic form filling, you'd need a browser extension. This is a simple popup interface for manual copying.</em>
+    </div>
+
+    <script>
+        let currentFormData = null;
+        
+        async function generateNewData() {
+            try {
+                const response = await fetch('/api/fill-form', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                currentFormData = data;
+                displayFormData(data);
+            } catch (error) {
+                alert('Error generating data. Make sure the server is running on localhost:5000');
+            }
+        }
+        
+        async function loadSelectedPersona() {
+            const select = document.getElementById('personaSelect');
+            const personaId = select.value;
+            if (!personaId) return;
+            
+            try {
+                const response = await fetch('/api/fill-form', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ persona_id: personaId })
+                });
+                const data = await response.json();
+                currentFormData = data;
+                displayFormData(data);
+            } catch (error) {
+                alert('Error loading persona data.');
+            }
+        }
+        
+        async function refreshPersonas() {
+            try {
+                const response = await fetch('/api/personas');
+                const personas = await response.json();
+                
+                const select = document.getElementById('personaSelect');
+                select.innerHTML = '<option value="">Select saved persona...</option>';
+                
+                personas.forEach(persona => {
+                    const option = document.createElement('option');
+                    option.value = persona.id;
+                    option.textContent = `${persona.name} (${persona.email})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading personas:', error);
+            }
+        }
+        
+        function displayFormData(data) {
+            const container = document.getElementById('formData');
+            
+            const fields = [
+                ['First Name', data.firstName],
+                ['Last Name', data.lastName],
+                ['Full Name', data.name],
+                ['Email', data.email],
+                ['Phone', data.phone],
+                ['Address', data.address],
+                ['City', data.city],
+                ['State', data.state],
+                ['ZIP', data.zip],
+                ['Country', data.country],
+                ['Company', data.company],
+                ['Job Title', data.jobTitle],
+                ['Website', data.website],
+                ['Credit Card', data.creditCard],
+                ['CC Expiry', data.ccExpiry],
+                ['CC CVV', data.ccCvv]
+            ];
+            
+            const html = `
+                <div class="form-data">
+                    <h4>Generated Form Data</h4>
+                    ${fields.map(([label, value]) => `
+                        <div class="field">
+                            <span class="label">${label}:</span>
+                            <span class="value" onclick="copyToClipboard('${value}')" style="cursor: pointer; text-decoration: underline;">${value}</span>
+                        </div>
+                    `).join('')}
+                    <br>
+                    <button class="btn btn-secondary" onclick="copyAllData()">📋 Copy All Data</button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                event.target.style.background = '#d4edda';
+                setTimeout(() => {
+                    event.target.style.background = '';
+                }, 1000);
+            });
+        }
+        
+        function copyAllData() {
+            if (!currentFormData) return;
+            
+            const text = Object.entries(currentFormData)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+                
+            navigator.clipboard.writeText(text).then(() => {
+                alert('All data copied to clipboard!');
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshPersonas();
+            generateNewData();
+        });
+    </script>
+</body>
+</html> 

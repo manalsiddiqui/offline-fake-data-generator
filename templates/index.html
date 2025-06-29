@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Fake Data Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s ease;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            width: 200px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .persona-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .persona-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .persona-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .persona-id {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .persona-details {
+            display: grid;
+            gap: 8px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .detail-value {
+            color: #6c757d;
+            text-align: right;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .persona-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab:hover {
+            background: #f8f9fa;
+        }
+        
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+            }
+            
+            .persona-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Offline Fake Data Generator</h1>
+            <p>Generate realistic fake personal data for testing and privacy</p>
+        </div>
+        
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('generate')">Generate</div>
+                <div class="tab" onclick="switchTab('saved')">Saved Personas</div>
+                <div class="tab" onclick="switchTab('help')">Help</div>
+            </div>
+            
+            <div id="generate-tab" class="tab-content active">
+                <div class="controls">
+                    <button class="btn" onclick="generatePersona()">🎲 Generate New Persona</button>
+                    <input type="text" id="seedInput" placeholder="Optional seed for reproducible data">
+                    <button class="btn btn-secondary" onclick="generateFromSeed()">🌱 Generate from Seed</button>
+                    <label>
+                        <input type="checkbox" id="autoSave"> Auto-save personas
+                    </label>
+                </div>
+                
+                <div id="currentPersona"></div>
+            </div>
+            
+            <div id="saved-tab" class="tab-content">
+                <div class="controls">
+                    <button class="btn" onclick="loadSavedPersonas()">🔄 Refresh List</button>
+                    <button class="btn btn-danger" onclick="clearAllPersonas()">🗑️ Clear All</button>
+                </div>
+                
+                <div id="savedPersonas"></div>
+            </div>
+            
+            <div id="help-tab" class="tab-content">
+                <h3>How to Use</h3>
+                <ul style="padding-left: 20px; margin: 20px 0;">
+                    <li><strong>Generate:</strong> Click "Generate New Persona" to create random fake data</li>
+                    <li><strong>Seeds:</strong> Use seeds for reproducible data - same seed = same persona</li>
+                    <li><strong>Save:</strong> Enable auto-save or manually save personas for later use</li>
+                    <li><strong>Browser Integration:</strong> Use localhost:5000/extension for form auto-fill</li>
+                    <li><strong>API:</strong> Available at /api/generate, /api/personas, /api/fill-form</li>
+                </ul>
+                
+                <h3>Browser Extension</h3>
+                <p>For auto-filling web forms, visit <a href="/extension" target="_blank">localhost:5000/extension</a></p>
+                
+                <h3>Privacy Notice</h3>
+                <p>All data is generated locally and stored only on your device. No data is sent to external servers.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPersona = null;
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+            
+            // Load data for saved personas tab
+            if (tabName === 'saved') {
+                loadSavedPersonas();
+            }
+        }
+        
+        async function generatePersona() {
+            const autoSave = document.getElementById('autoSave').checked;
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ save: autoSave })
+                });
+                
+                const persona = await response.json();
+                currentPersona = persona;
+                displayPersona(persona);
+            } catch (error) {
+                console.error('Error generating persona:', error);
+                alert('Error generating persona. Make sure the server is running.');
+            }
+        }
+        
+        async function generateFromSeed() {
+            const seed = document.getElementById('seedInput').value.trim();
+            if (!seed) {
+                alert('Please enter a seed value');
+                return;
+            }
+            
+            const autoSave = document.getElementById('autoSave').checked;
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ seed: seed, save: autoSave })
+                });
+                
+                const persona = await response.json();
+                currentPersona = persona;
+                displayPersona(persona);
+            } catch (error) {
+                console.error('Error generating persona:', error);
+                alert('Error generating persona. Make sure the server is running.');
+            }
+        }
+        
+        function displayPersona(persona) {
+            const container = document.getElementById('currentPersona');
+            
+            const html = `
+                <div class="persona-card">
+                    <div class="persona-header">
+                        <div>
+                            <div class="persona-name">${persona.name}</div>
+                            <div class="persona-id">ID: ${persona.id || 'Not saved'}</div>
+                        </div>
+                        <div class="persona-actions">
+                            ${!persona.id ? '<button class="btn btn-small" onclick="saveCurrentPersona()">💾 Save</button>' : ''}
+                            <button class="btn btn-small btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
+                            <button class="btn btn-small btn-secondary" onclick="exportPersona()">📤 Export</button>
+                        </div>
+                    </div>
+                    
+                    <div class="persona-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${persona.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">${persona.phone}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Address:</span>
+                            <span class="detail-value">${persona.address.full_address}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Job:</span>
+                            <span class="detail-value">${persona.job}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SSN:</span>
+                            <span class="detail-value">${persona.ssn}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Credit Card:</span>
+                            <span class="detail-value">${persona.credit_card.number}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Website:</span>
+                            <span class="detail-value">${persona.website}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Age:</span>
+                            <span class="detail-value">${persona.age}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        async function saveCurrentPersona() {
+            if (!currentPersona) return;
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ save: true, seed: currentPersona.seed })
+                });
+                
+                const persona = await response.json();
+                currentPersona = persona;
+                displayPersona(persona);
+                alert('Persona saved successfully!');
+            } catch (error) {
+                console.error('Error saving persona:', error);
+                alert('Error saving persona.');
+            }
+        }
+        
+        function copyToClipboard() {
+            if (!currentPersona) return;
+            
+            const text = `Name: ${currentPersona.name}
+Email: ${currentPersona.email}
+Phone: ${currentPersona.phone}
+Address: ${currentPersona.address.full_address}
+Job: ${currentPersona.job}
+SSN: ${currentPersona.ssn}
+Credit Card: ${currentPersona.credit_card.number}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Persona copied to clipboard!');
+            });
+        }
+        
+        function exportPersona() {
+            if (!currentPersona) return;
+            
+            const blob = new Blob([JSON.stringify(currentPersona, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `persona_${currentPersona.name.replace(/\s+/g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function loadSavedPersonas() {
+            const container = document.getElementById('savedPersonas');
+            container.innerHTML = '<div class="loading">Loading saved personas...</div>';
+            
+            try {
+                const response = await fetch('/api/personas');
+                const personas = await response.json();
+                
+                if (personas.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No saved personas found.</div>';
+                    return;
+                }
+                
+                const html = personas.map(persona => `
+                    <div class="persona-card">
+                        <div class="persona-header">
+                            <div>
+                                <div class="persona-name">${persona.name}</div>
+                                <div class="persona-id">Created: ${persona.created_at.split('T')[0]}</div>
+                            </div>
+                        </div>
+                        <div class="persona-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value">${persona.email}</span>
+                            </div>
+                        </div>
+                        <div class="persona-actions">
+                            <button class="btn btn-small" onclick="loadPersona('${persona.id}')">👁️ View</button>
+                            <button class="btn btn-small btn-secondary" onclick="regeneratePersona('${persona.id}')">🔄 Regenerate</button>
+                            <button class="btn btn-small btn-danger" onclick="deletePersona('${persona.id}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = `<div class="persona-grid">${html}</div>`;
+            } catch (error) {
+                console.error('Error loading personas:', error);
+                container.innerHTML = '<div class="empty-state">Error loading personas.</div>';
+            }
+        }
+        
+        async function loadPersona(personaId) {
+            try {
+                const response = await fetch(`/api/personas/${personaId}`);
+                const persona = await response.json();
+                
+                currentPersona = persona;
+                switchTab('generate');
+                document.querySelector('.tab').click(); // Switch to generate tab
+                displayPersona(persona);
+            } catch (error) {
+                console.error('Error loading persona:', error);
+                alert('Error loading persona.');
+            }
+        }
+        
+        async function regeneratePersona(personaId) {
+            try {
+                const response = await fetch(`/api/personas/${personaId}/regenerate`, {
+                    method: 'POST'
+                });
+                const persona = await response.json();
+                
+                currentPersona = persona;
+                switchTab('generate');
+                document.querySelector('.tab').click();
+                displayPersona(persona);
+                alert('Persona regenerated successfully!');
+            } catch (error) {
+                console.error('Error regenerating persona:', error);
+                alert('Error regenerating persona.');
+            }
+        }
+        
+        async function deletePersona(personaId) {
+            if (!confirm('Are you sure you want to delete this persona?')) return;
+            
+            try {
+                await fetch(`/api/personas/${personaId}`, {
+                    method: 'DELETE'
+                });
+                
+                loadSavedPersonas(); // Refresh the list
+                alert('Persona deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting persona:', error);
+                alert('Error deleting persona.');
+            }
+        }
+        
+        async function clearAllPersonas() {
+            if (!confirm('Are you sure you want to delete ALL personas? This cannot be undone.')) return;
+            
+            try {
+                const response = await fetch('/api/personas');
+                const personas = await response.json();
+                
+                for (const persona of personas) {
+                    await fetch(`/api/personas/${persona.id}`, {
+                        method: 'DELETE'
+                    });
+                }
+                
+                loadSavedPersonas();
+                alert('All personas deleted successfully!');
+            } catch (error) {
+                console.error('Error clearing personas:', error);
+                alert('Error clearing personas.');
+            }
+        }
+        
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            generatePersona(); // Generate initial persona
+        });
+    </script>
+</body>
+</html> 
