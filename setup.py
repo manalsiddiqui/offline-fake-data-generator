@@ -24,7 +24,7 @@ setup(
     description='A comprehensive tool for generating realistic fake personal information offline',
     long_description=read_readme(),
     long_description_content_type='text/markdown',
-    url='https://github.com/YOUR_USERNAME/offline-fake-data-generator',
+    url='https://github.com/manalsiddiqui/offline-fake-data-generator',
     
     # Package discovery
     packages=find_packages(),
@@ -85,10 +85,10 @@ setup(
     
     # Project URLs
     project_urls={
-        'Bug Reports': 'https://github.com/YOUR_USERNAME/offline-fake-data-generator/issues',
-        'Source': 'https://github.com/YOUR_USERNAME/offline-fake-data-generator',
-        'Documentation': 'https://github.com/YOUR_USERNAME/offline-fake-data-generator/wiki',
-        'Changelog': 'https://github.com/YOUR_USERNAME/offline-fake-data-generator/blob/main/CHANGELOG.md',
+        'Bug Reports': 'https://github.com/manalsiddiqui/offline-fake-data-generator/issues',
+        'Source': 'https://github.com/manalsiddiqui/offline-fake-data-generator',
+        'Documentation': 'https://github.com/manalsiddiqui/offline-fake-data-generator/wiki',
+        'Changelog': 'https://github.com/manalsiddiqui/offline-fake-data-generator/blob/main/CHANGELOG.md',
     },
     
     # License

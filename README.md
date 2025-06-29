@@ -2,8 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![Platform Support](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/YOUR_USERNAME/offline-fake-data-generator)
-[![Privacy First](https://img.shields.io/badge/privacy-first-green.svg)](https://github.com/YOUR_USERNAME/offline-fake-data-generator)
+[![Platform Support](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/manalsiddiqui/offline-fake-data-generator)
+[![Privacy First](https://img.shields.io/badge/privacy-first-green.svg)](https://github.com/manalsiddiqui/offline-fake-data-generator)
 
 A comprehensive tool for generating realistic fake personal information offline. Perfect for testing, development, and privacy-conscious browsing.
 
@@ -173,7 +173,7 @@ This tool is designed to help people maintain privacy online. Contributions are 
 
 ### Quick Contributing Guide
 1. **Fork** the repository on GitHub
-2. **Clone** your fork: `git clone https://github.com/YOUR_USERNAME/offline-fake-data-generator.git`
+2. **Clone** your fork: `git clone https://github.com/manalsiddiqui/offline-fake-data-generator.git`
 3. **Set up** development environment: `./setup.sh`
 4. **Create** a feature branch: `git checkout -b feature/amazing-feature`
 5. **Make** your changes and test them

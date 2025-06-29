@@ -7,7 +7,7 @@ Thank you for your interest in contributing to the Offline Fake Data Generator! 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/offline-fake-data-generator.git
+   git clone https://github.com/manalsiddiqui/offline-fake-data-generator.git
    cd offline-fake-data-generator
    ```
 3. **Set up the development environment**:
